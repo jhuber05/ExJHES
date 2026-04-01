@@ -5,12 +5,12 @@ import { Toaster as HotToaster } from "react-hot-toast";
 export function Toaster() {
   return (
     <HotToaster
-      position="bottom-right"
+      position="top-center"
       toastOptions={{
         style: {
-          background: "#1a1a1a",
-          color: "#ededed",
-          border: "1px solid #262626",
+          background: "#ffffff",
+          color: "#1f2937",
+          border: "1px solid #e5e7eb",
         },
       }}
     />

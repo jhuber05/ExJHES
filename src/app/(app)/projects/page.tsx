@@ -1,11 +1,42 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Trash2, FolderOpen, Plus } from "lucide-react";
+import { Trash2, FolderOpen, Plus, Pencil, Check, X } from "lucide-react";
 import { useEpoxyStore } from "@/lib/store/epoxy-store";
+import toast from "react-hot-toast";
 
 export default function ProjectsPage() {
-  const { projects, deleteProject, loadProject } = useEpoxyStore();
+  const { projects, deleteProject, loadProject, fetchProjects, renameProject } =
+    useEpoxyStore();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const startRename = (id: string, currentName: string) => {
+    setEditingId(id);
+    setEditName(currentName);
+  };
+
+  const confirmRename = async () => {
+    if (!editingId || !editName.trim()) return;
+    try {
+      await renameProject(editingId, editName.trim());
+      toast.success("Project renamed");
+    } catch {
+      toast.error("Failed to rename");
+    }
+    setEditingId(null);
+    setEditName("");
+  };
+
+  const cancelRename = () => {
+    setEditingId(null);
+    setEditName("");
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -18,7 +49,7 @@ export default function ProjectsPage() {
         </div>
         <Link
           href="/editor"
-          className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-black font-medium px-5 py-2.5 rounded-xl transition-colors"
+          className="flex items-center gap-2 bg-accent hover:bg-accent-hover text-white font-medium px-5 py-2.5 rounded-xl transition-colors"
         >
           <Plus className="w-4 h-4" />
           New Project
@@ -80,7 +111,45 @@ export default function ProjectsPage() {
 
               {/* Info */}
               <div className="p-4">
-                <h3 className="font-medium truncate">{project.name}</h3>
+                {editingId === project.id ? (
+                  <div className="flex items-center gap-1 mb-1">
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") confirmRename();
+                        if (e.key === "Escape") cancelRename();
+                      }}
+                      className="flex-1 bg-card border border-card-border rounded px-2 py-1 text-sm font-medium"
+                      autoFocus
+                    />
+                    <button
+                      onClick={confirmRename}
+                      className="p-1 text-accent hover:text-accent-hover"
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={cancelRename}
+                      className="p-1 text-muted hover:text-foreground"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 mb-1">
+                    <h3 className="font-medium truncate flex-1">
+                      {project.name}
+                    </h3>
+                    <button
+                      onClick={() => startRename(project.id, project.name)}
+                      className="p-1 text-muted hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
                 <p className="text-xs text-muted mt-1">
                   {new Date(project.createdAt).toLocaleDateString()} &middot;{" "}
                   {project.config.flakeType === "none"

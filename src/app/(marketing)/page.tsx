@@ -52,7 +52,7 @@ export default function HomePage() {
     <main>
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-purple-500/3 to-transparent pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
           <div className="text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-accent/10 text-accent text-sm font-medium px-4 py-1.5 rounded-full mb-6">
@@ -60,7 +60,7 @@ export default function HomePage() {
             </div>
             <h1 className="text-5xl sm:text-6xl font-bold tracking-tight leading-tight">
               Visualize Epoxy Floors{" "}
-              <span className="text-accent">Before You Pour</span>
+              <span className="accent-gradient-text">Before You Pour</span>
             </h1>
             <p className="mt-6 text-lg text-muted max-w-2xl mx-auto">
               Upload a photo of any room. Choose your epoxy coating — color,
@@ -70,13 +70,13 @@ export default function HomePage() {
             <div className="mt-10 flex items-center justify-center gap-4">
               <Link
                 href="/editor"
-                className="bg-accent hover:bg-accent-hover text-black font-semibold px-8 py-3.5 rounded-xl text-lg transition-colors"
+                className="inline-block bg-accent hover:bg-accent-hover hover:scale-105 hover:shadow-lg text-white font-semibold px-8 py-3.5 rounded-xl text-lg transition-all duration-500 ease-in-out"
               >
                 Try the Visualizer
               </Link>
               <a
                 href="#features"
-                className="border border-card-border hover:border-muted px-8 py-3.5 rounded-xl text-lg transition-colors"
+                className="inline-block border border-card-border hover:border-muted hover:scale-105 hover:shadow-lg px-8 py-3.5 rounded-xl text-lg transition-all duration-500 ease-in-out"
               >
                 See Features
               </a>
@@ -88,10 +88,10 @@ export default function HomePage() {
       {/* Demo Preview */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="relative rounded-2xl border border-card-border bg-card overflow-hidden">
-          <div className="aspect-video bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+          <div className="aspect-video bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 flex items-center justify-center">
             <div className="text-center">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 mx-auto mb-4 flex items-center justify-center">
-                <Palette className="w-10 h-10 text-black" />
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-red-500 mx-auto mb-4 flex items-center justify-center">
+                <Palette className="w-10 h-10 text-white" />
               </div>
               <p className="text-muted text-lg">
                 Interactive demo — try the editor
@@ -146,7 +146,7 @@ export default function HomePage() {
           </p>
           <Link
             href="/editor"
-            className="inline-block bg-accent hover:bg-accent-hover text-black font-semibold px-8 py-3.5 rounded-xl text-lg transition-colors"
+            className="inline-block bg-accent hover:bg-accent-hover text-white font-semibold px-8 py-3.5 rounded-xl text-lg transition-colors"
           >
             Start Free
           </Link>

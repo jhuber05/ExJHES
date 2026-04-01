@@ -17,7 +17,7 @@ export function BeforeAfter({ before, after }: BeforeAfterProps) {
     if (!container) return;
     const rect = container.getBoundingClientRect();
     const x = clientX - rect.left;
-    const percent = Math.max(0, Math.min(100, (x / rect.width) * 100));
+    const percent = Math.max(2, Math.min(98, (x / rect.width) * 100));
     setPosition(percent);
   }, []);
 
@@ -47,31 +47,26 @@ export function BeforeAfter({ before, after }: BeforeAfterProps) {
   return (
     <div
       ref={containerRef}
-      className="before-after-container relative w-full aspect-video rounded-lg overflow-hidden"
+      className="before-after-container relative rounded-lg overflow-hidden mx-auto inline-block"
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onTouchMove={handleTouchMove}
     >
-      {/* After (full) */}
+      {/* After image sets the size of the container */}
       <img
         src={after}
         alt="After"
-        className="absolute inset-0 w-full h-full object-contain"
+        className="block max-h-[60vh] max-w-full h-auto w-auto rounded-lg"
       />
-      {/* Before (clipped) */}
-      <div
-        className="absolute inset-0 overflow-hidden"
-        style={{ width: `${position}%` }}
-      >
-        <img
-          src={before}
-          alt="Before"
-          className="absolute inset-0 w-full h-full object-contain"
-          style={{ minWidth: containerRef.current?.offsetWidth }}
-        />
-      </div>
+      {/* Before image overlaid and clipped */}
+      <img
+        src={before}
+        alt="Before"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
+      />
       {/* Slider line */}
       <div
         className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg z-10"
@@ -96,10 +91,10 @@ export function BeforeAfter({ before, after }: BeforeAfterProps) {
         </div>
       </div>
       {/* Labels */}
-      <div className="absolute top-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded">
+      <div className="absolute top-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded z-20">
         Before
       </div>
-      <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded">
+      <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded z-20">
         After
       </div>
     </div>

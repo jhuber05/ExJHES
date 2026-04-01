@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     const base64Data = matches[2];
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash-exp",
+      model: "gemini-2.5-flash-image",
       contents: [
         {
           role: "user",

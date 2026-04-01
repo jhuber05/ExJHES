@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --accent: #f59e0b;
-  --accent-hover: #d97706;
-  --card: #141414;
-  --card-border: #262626;
-  --muted: #737373;
+  --background: #f9fafb;
+  --foreground: #1f2937;
+  --accent: #3b82f6;
+  --accent-hover: #ef4444;
+  --accent-gradient: linear-gradient(135deg, #3b82f6, #ef4444);
+  --card: #ffffff;
+  --card-border: #e5e7eb;
+  --muted: #6b7280;
 }
 
 @theme inline {
@@ -36,31 +37,56 @@ body {
   background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--card-border);
+  background: #d1d5db;
   border-radius: 3px;
+}
+
+/* Gradient accent utilities */
+.accent-gradient {
+  background: var(--accent-gradient);
+}
+.accent-gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Range input styling */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  background: transparent;
   cursor: pointer;
   width: 100%;
-}
-input[type="range"]::-webkit-slider-track {
-  height: 4px;
-  background: var(--card-border);
-  border-radius: 2px;
+  height: 6px;
+  background: #3b82f6;
+  border-radius: 3px;
+  outline: none;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  height: 16px;
-  width: 16px;
+  height: 18px;
+  width: 18px;
   border-radius: 50%;
-  background: var(--accent);
-  margin-top: -6px;
+  background: white;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  background: #3b82f6;
+  border-radius: 3px;
+}
+input[type="range"]::-moz-range-thumb {
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 
 /* Before/after slider */

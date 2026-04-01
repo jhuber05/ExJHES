@@ -47,22 +47,29 @@ export function GenerateButton() {
   };
 
   return (
-    <button
-      onClick={handleGenerate}
-      disabled={!originalImage || isGenerating}
-      className="w-full flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-black font-semibold py-3 px-6 rounded-xl transition-colors"
-    >
-      {isGenerating ? (
-        <>
-          <Loader2 className="w-5 h-5 animate-spin" />
-          Generating...
-        </>
-      ) : (
-        <>
-          <Sparkles className="w-5 h-5" />
-          Generate Preview
-        </>
+    <div className="relative group w-full">
+      <button
+        onClick={handleGenerate}
+        disabled={!originalImage || isGenerating}
+        className="w-full flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Generating...
+          </>
+        ) : (
+          <>
+            <Sparkles className="w-5 h-5" />
+            Generate Preview
+          </>
+        )}
+      </button>
+      {!originalImage && !isGenerating && (
+        <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-foreground text-background text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+          Upload image first
+        </span>
       )}
-    </button>
+    </div>
   );
 }

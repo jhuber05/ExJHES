@@ -21,6 +21,44 @@ export interface Project {
   createdAt: string;
 }
 
+interface DbProject {
+  id: string;
+  name: string;
+  baseColor: string;
+  secondaryColor: string;
+  flakeType: string;
+  flakeDensity: number;
+  flakeSize: string;
+  glossLevel: number;
+  metallicEffect: boolean;
+  texture: string;
+  roomType: string;
+  originalImage: string | null;
+  generatedImage: string | null;
+  createdAt: string;
+}
+
+function dbToProject(p: DbProject): Project {
+  return {
+    id: p.id,
+    name: p.name,
+    config: {
+      baseColor: p.baseColor,
+      secondaryColor: p.secondaryColor,
+      flakeType: p.flakeType as EpoxyConfig["flakeType"],
+      flakeDensity: p.flakeDensity,
+      flakeSize: p.flakeSize as EpoxyConfig["flakeSize"],
+      glossLevel: p.glossLevel,
+      metallicEffect: p.metallicEffect,
+      texture: p.texture as EpoxyConfig["texture"],
+      roomType: p.roomType,
+    },
+    originalImage: p.originalImage,
+    generatedImage: p.generatedImage,
+    createdAt: p.createdAt,
+  };
+}
+
 interface EpoxyStore {
   config: EpoxyConfig;
   originalImage: string | null;
@@ -33,9 +71,11 @@ interface EpoxyStore {
   setOriginalImage: (image: string | null) => void;
   setGeneratedImage: (image: string | null) => void;
   setIsGenerating: (value: boolean) => void;
-  saveProject: (name: string) => void;
+  saveProject: (name: string) => Promise<void>;
   loadProject: (id: string) => void;
-  deleteProject: (id: string) => void;
+  deleteProject: (id: string) => Promise<void>;
+  renameProject: (id: string, name: string) => Promise<void>;
+  fetchProjects: () => Promise<void>;
   resetConfig: () => void;
 }
 
@@ -68,18 +108,37 @@ export const useEpoxyStore = create<EpoxyStore>((set, get) => ({
 
   setIsGenerating: (value) => set({ isGenerating: value }),
 
-  saveProject: (name) => {
+  fetchProjects: async () => {
+    try {
+      const res = await fetch("/api/projects");
+      if (!res.ok) return;
+      const data: DbProject[] = await res.json();
+      if (Array.isArray(data)) {
+        set({ projects: data.map(dbToProject) });
+      }
+    } catch {
+      // silently fail
+    }
+  },
+
+  saveProject: async (name) => {
     const { config, originalImage, generatedImage } = get();
-    const project: Project = {
-      id: crypto.randomUUID(),
-      name,
-      config: { ...config },
-      originalImage,
-      generatedImage,
-      createdAt: new Date().toISOString(),
-    };
+    console.log("saveProject - originalImage:", originalImage ? `${originalImage.length} chars` : null);
+    console.log("saveProject - generatedImage:", generatedImage ? `${generatedImage.length} chars` : null);
+    const res = await fetch("/api/projects", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, config, originalImage, generatedImage }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error("Save project error:", err);
+      throw new Error("Failed to save");
+    }
+    const data: DbProject = await res.json();
+    const project = dbToProject(data);
     set((state) => ({
-      projects: [...state.projects, project],
+      projects: [project, ...state.projects],
       activeProjectId: project.id,
     }));
   },
@@ -96,12 +155,28 @@ export const useEpoxyStore = create<EpoxyStore>((set, get) => ({
     }
   },
 
-  deleteProject: (id) =>
+  renameProject: async (id, name) => {
+    const res = await fetch(`/api/projects/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    if (!res.ok) throw new Error("Failed to rename");
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p.id === id ? { ...p, name } : p
+      ),
+    }));
+  },
+
+  deleteProject: async (id) => {
+    await fetch(`/api/projects/${id}`, { method: "DELETE" });
     set((state) => ({
       projects: state.projects.filter((p) => p.id !== id),
       activeProjectId:
         state.activeProjectId === id ? null : state.activeProjectId,
-    })),
+    }));
+  },
 
   resetConfig: () => set({ config: { ...defaultConfig }, generatedImage: null }),
 }));

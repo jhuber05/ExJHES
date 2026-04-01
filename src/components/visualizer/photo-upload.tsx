@@ -35,7 +35,7 @@ export function PhotoUpload() {
         <img
           src={originalImage}
           alt="Uploaded room"
-          className="w-full h-full object-contain rounded-lg"
+          className="max-h-[60vh] max-w-full h-auto w-auto object-contain rounded-lg mx-auto block"
         />
         <button
           onClick={() => setOriginalImage(null)}

@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Download, Save, RotateCcw, ChevronDown, ChevronUp } from "lucide-react";
+import { Download, Save, RotateCcw, ImagePlus } from "lucide-react";
 import toast from "react-hot-toast";
 import { useEpoxyStore } from "@/lib/store/epoxy-store";
 import { PhotoUpload } from "@/components/visualizer/photo-upload";
 import { ColorControls } from "@/components/visualizer/color-controls";
-import { PresetGallery } from "@/components/visualizer/preset-gallery";
 import { GenerateButton } from "@/components/visualizer/generate-button";
 import { BeforeAfter } from "@/components/visualizer/before-after";
+import { ProductColorPicker } from "@/components/visualizer/product-color-picker";
+import { ProductFlakePicker } from "@/components/visualizer/product-flake-picker";
 
 export default function EditorPage() {
   const {
@@ -16,22 +16,20 @@ export default function EditorPage() {
     generatedImage,
     resetConfig,
     saveProject,
+    setOriginalImage,
   } = useEpoxyStore();
 
-  const [showPresets, setShowPresets] = useState(true);
-  const [projectName, setProjectName] = useState("");
-  const [showSaveDialog, setShowSaveDialog] = useState(false);
 
-  const handleSave = () => {
-    if (!projectName.trim()) {
-      toast.error("Enter a project name");
-      return;
+  const handleQuickSave = async () => {
+    const name = `Project ${new Date().toLocaleString()}`;
+    try {
+      await saveProject(name);
+      toast.success("Project saved!");
+    } catch {
+      toast.error("Failed to save project");
     }
-    saveProject(projectName.trim());
-    setProjectName("");
-    setShowSaveDialog(false);
-    toast.success("Project saved!");
   };
+
 
   const handleDownload = () => {
     if (!generatedImage) return;
@@ -46,20 +44,23 @@ export default function EditorPage() {
       {/* Sidebar Controls */}
       <aside className="w-full lg:w-80 xl:w-96 border-b lg:border-b-0 lg:border-r border-card-border overflow-y-auto bg-card/50">
         <div className="p-4 space-y-4">
-          {/* Presets Section */}
+          {/* Product Colors */}
           <div>
-            <button
-              onClick={() => setShowPresets(!showPresets)}
-              className="w-full flex items-center justify-between text-sm font-semibold uppercase tracking-wider text-muted mb-2"
-            >
-              Presets
-              {showPresets ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </button>
-            {showPresets && <PresetGallery />}
+            <p className="text-sm font-semibold uppercase tracking-wider text-muted mb-3">
+              Product Colors
+            </p>
+            <ProductColorPicker />
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-card-border" />
+
+          {/* Product Flakes */}
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wider text-muted mb-3">
+              Product Flakes
+            </p>
+            <ProductFlakePicker />
           </div>
 
           {/* Divider */}
@@ -81,9 +82,8 @@ export default function EditorPage() {
             <GenerateButton />
             <div className="flex gap-2">
               <button
-                onClick={() => setShowSaveDialog(true)}
-                disabled={!generatedImage}
-                className="flex-1 flex items-center justify-center gap-2 border border-card-border hover:border-muted disabled:opacity-50 disabled:cursor-not-allowed py-2 px-4 rounded-xl text-sm transition-colors"
+                onClick={handleQuickSave}
+                className="flex-1 flex items-center justify-center gap-2 border border-card-border hover:border-muted py-2 px-4 rounded-xl text-sm transition-colors"
               >
                 <Save className="w-4 h-4" />
                 Save
@@ -107,50 +107,42 @@ export default function EditorPage() {
           </div>
         </div>
 
-        {/* Save Dialog */}
-        {showSaveDialog && (
-          <div className="p-4 border-t border-card-border">
-            <p className="text-sm font-medium mb-2">Save Project</p>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
-                placeholder="Project name..."
-                className="flex-1 bg-card border border-card-border rounded-lg px-3 py-2 text-sm"
-                onKeyDown={(e) => e.key === "Enter" && handleSave()}
-              />
-              <button
-                onClick={handleSave}
-                className="bg-accent hover:bg-accent-hover text-black font-medium px-4 py-2 rounded-lg text-sm transition-colors"
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setShowSaveDialog(false)}
-                className="border border-card-border hover:border-muted px-3 py-2 rounded-lg text-sm transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
       </aside>
 
       {/* Main Viewport */}
-      <div className="flex-1 flex items-center justify-center p-6 overflow-y-auto">
-        <div className="w-full max-w-4xl">
+      <div className="flex-1 flex items-center justify-center p-6 overflow-hidden">
+        <div className="w-full max-w-4xl max-h-full flex flex-col items-center">
           {!originalImage ? (
             <PhotoUpload />
           ) : generatedImage ? (
-            <div className="space-y-4">
-              <BeforeAfter before={originalImage} after={generatedImage} />
-              <p className="text-center text-xs text-muted">
+            <div className="flex flex-col items-center gap-3 max-h-full min-h-0">
+              <div className="min-h-0 shrink w-full flex justify-center">
+                <BeforeAfter before={originalImage} after={generatedImage} />
+              </div>
+              <p className="text-center text-xs text-muted shrink-0">
                 Drag the slider to compare before and after
               </p>
+              <button
+                onClick={() => setOriginalImage(null)}
+                className="shrink-0 flex items-center gap-2 border border-card-border hover:border-accent text-muted hover:text-foreground px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300"
+              >
+                <ImagePlus className="w-4 h-4" />
+                Start Over with New Image
+              </button>
             </div>
           ) : (
-            <PhotoUpload />
+            <div className="space-y-4">
+              <PhotoUpload />
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setOriginalImage(null)}
+                  className="flex items-center gap-2 text-muted hover:text-foreground text-sm transition-colors duration-300"
+                >
+                  <ImagePlus className="w-4 h-4" />
+                  Upload a different image
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>
